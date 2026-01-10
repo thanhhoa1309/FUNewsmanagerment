@@ -1,0 +1,52 @@
+services:
+  funewsmanagerment:
+    image: ${DOCKER_REGISTRY-}funewsmanagerment
+    container_name: funews-api
+    build:
+      context: .
+      dockerfile: FUNewsManagerment/Dockerfile
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=FUNewsManagementDB;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true
+      - JWT__SecretKey=FUNewsManagement_SECRETKEY_SIEUCAPBAOMAT_VAYMACHUADU32KYTU
+      - JWT__Issuer=FUNewsManagementSystem
+      - JWT__Audience=FUNewsManagementSystemUsers
+      - JWT__ExpirationInMinutes=60
+    ports:
+      - "5001:8080"
+    networks:
+      - funews-network
+    restart: unless-stopped
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: funews-sqlserver
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "YourStrong@Passw0rd"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - funews-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P YourStrong@Passw0rd -Q 'SELECT 1' -C || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 80s
+
+volumes:
+  sqlserver-data:
+    driver: local
+
+networks:
+  funews-network:
+    driver: bridge
