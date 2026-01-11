@@ -10,7 +10,6 @@ services:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=FUNewsManagementDB;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true
       - JWT__SecretKey=FUNewsManagement_SECRETKEY_SIEUCAPBAOMAT_VAYMACHUADU32KYTU
       - JWT__Issuer=FUNewsManagementSystem
